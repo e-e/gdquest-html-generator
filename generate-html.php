@@ -1,11 +1,23 @@
 <?php
 
+/**
+ * Class Template
+ */
 class Template
 {
+    /** @var string $template */
     public $template = "";
 
+    /**
+     * @param string $name
+     * @return mixed
+     */
     public function __get(string $name)
     {
+        if (property_exists(get_class($this), $name)) {
+            return $this->$name;
+        }
+
         $method = "get" . ucfirst($name);
 
         if (!method_exists($this, $method)) {
@@ -15,6 +27,9 @@ class Template
         return $this->$method();
     }
 
+    /**
+     * @return string
+     */
     public function parse() : string
     {
         $template = $this->template;
@@ -29,6 +44,9 @@ class Template
         return $template;
     }
 
+    /**
+     * @return array
+     */
     private function getVarsFromTemplate() : array
     {
         $keys = [];
@@ -50,12 +68,16 @@ class Template
     }
 }
 
+/**
+ * Class Page
+ */
 class Page extends Template
 {
+    /** @var string $template */
     public $template = <<<HTML
 <html>
     <head>
-        <title>GDQuest</title>
+        <title>{{title}}</title>
         <style>{{css}}</style>
     </head>
     <body>
@@ -65,6 +87,19 @@ class Page extends Template
 </html>
 HTML;
 
+    /** @var string $title */
+    public $title;
+
+    /**
+     * @param string $title
+     */
+    public function __construct(string $title) {
+        $this->title = $title;
+    }
+
+    /**
+     * @return string
+     */
     public function getChapters() : string
     {
         $directories = array_filter(
@@ -83,6 +118,9 @@ HTML;
         return implode("", $chapters);
     }
 
+    /**
+     * @return string
+     */
     public function getCss() : string
     {
         return <<<CSS
@@ -112,7 +150,7 @@ HTML;
     display:none;
 }
 video {
-    width: 100vw;
+    width: 100%;
     margin-top:15px;
 }
 .video-toggle {
@@ -127,7 +165,9 @@ video {
 CSS;
     }
 
-
+    /**
+     * @return string
+     */
     public function getJs() : string
     {
         return <<<JS
@@ -190,8 +230,12 @@ JS;
 
 }
 
+/**
+ * Class Chapter
+ */
 class Chapter extends Template
 {
+    /** @var string $template */
     public $template = <<<HTML
 <div class="chapter">
     <h2><a href="#" class="show-chapter" data-name="{{name}}">{{name}}</a></h2>
@@ -199,13 +243,20 @@ class Chapter extends Template
 </div>
 HTML;
 
+    /** @var string $name */
     public $name;
 
+    /**
+     * @param string $name
+    */
     public function __construct(string $name)
     {
         $this->name = $name;
     }
 
+    /**
+     * @return string
+     */
     public function getVideos() : string
     {
         $dir = "./{$this->name}";
@@ -228,6 +279,11 @@ HTML;
         return implode("", $videos);
     }
 
+    /**
+     * @param string $filename
+     * @param string $targetExtension
+     * @return bool
+     */
     private function isExtn(string $filename, string $targetExtension) : bool
     {
         $parts = explode(".", $filename);
@@ -236,10 +292,14 @@ HTML;
     }
 }
 
+/**
+ * Class Video
+ */
 class Video extends Template
 {
     const EXTN = "mp4";
 
+    /** @var string $template */
     public $template = <<<HTML
 <div class="video">
     <div class="title">
@@ -254,19 +314,32 @@ class Video extends Template
 </div>
 HTML;
 
+    /** @var string $name */
     public $name;
+
+    /** @var Chapter $chapter */
     public $chapter;
 
+    /**
+     * @param Chapter $chapter
+     * @param string $name
+     */
     public function __construct(Chapter $chapter, string $name)
     {
         $this->chapter = $chapter;
         $this->name = $name;
     }
 
+    /**
+     * @return string
+     */
     public function getVideoSource() : string
     {
         return "./{$this->chapter->name}/{$this->name}";
     }
 }
 
-file_put_contents("./index.html", (new Page())->parse());
+file_put_contents(
+    "./index.html", 
+    (new Page("GDQuest"))->parse()
+);
