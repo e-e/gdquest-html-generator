@@ -159,7 +159,7 @@ HTML;
 }
 video {
     max-width:100%;
-    max-height:100vh;
+    max-height:90vh;
     width: 100%;
     margin-top:15px;
 }
