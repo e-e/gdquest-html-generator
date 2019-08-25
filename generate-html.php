@@ -1,5 +1,12 @@
 <?php
 
+function is_extn(string $filename, string $targetExtension) : bool
+{
+    $parts = explode(".", $filename);
+    $actualExtension = $parts[count($parts) - 1];
+    return strtolower($targetExtension) === strtolower($actualExtension);
+}
+
 /**
  * Class Template
  */
@@ -127,6 +134,7 @@ HTML;
 * {
     margin: 0;
     padding: 0;
+    font-family: sans-serif;
 }
 .chapter {
     margin:10px;
@@ -159,7 +167,11 @@ video {
     background-color:#fa6f48;
     color:#fff;
     font-size:0.8em;
-    padding:0.2em;
+    border-radius:5px;
+    padding: 2px 5px 2px 5px;
+}
+.video-toggle:hover {
+    color: #ccc;
 }
 
 CSS;
@@ -264,7 +276,7 @@ HTML;
             scandir($dir),
             function ($item) use ($dir) {
                 return !is_dir("$dir/$item")
-                    && $this->isExtn($item, Video::EXTN)
+                    && is_extn($item, Video::EXTN)
                     && !in_array($item, [".", ".."]);
             }
         ));
@@ -277,18 +289,6 @@ HTML;
         );
 
         return implode("", $videos);
-    }
-
-    /**
-     * @param string $filename
-     * @param string $targetExtension
-     * @return bool
-     */
-    private function isExtn(string $filename, string $targetExtension) : bool
-    {
-        $parts = explode(".", $filename);
-        $actualExtension = $parts[count($parts) - 1];
-        return strtolower($targetExtension) === strtolower($actualExtension);
     }
 }
 
