@@ -158,6 +158,8 @@ HTML;
     display:none;
 }
 video {
+    max-width:100%;
+    max-height:100vh;
     width: 100%;
     margin-top:15px;
 }
